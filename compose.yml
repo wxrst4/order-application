@@ -1,0 +1,30 @@
+services:
+  order-pg:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: order
+      POSTGRES_USER: order
+      POSTGRES_DB: order
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 1s
+      retries: 10
+
+  order-app:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      POSTGRES_HOST: order-pg:5432
+      POSTGRES_USERNAME: order
+      POSTGRES_PASSWORD: order
+      POSTGRES_DB: order
+    depends_on:
+      order-pg:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
