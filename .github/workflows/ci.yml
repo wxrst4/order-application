@@ -7,6 +7,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: order
+          POSTGRES_USER: order
+          POSTGRES_PASSWORD: order
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U order -d order"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -19,4 +34,9 @@ jobs:
           cache: maven
 
       - name: Build application
+        env:
+          POSTGRES_HOST: localhost:5432
+          POSTGRES_DB: order
+          POSTGRES_USERNAME: order
+          POSTGRES_PASSWORD: order
         run: ./mvnw clean package
