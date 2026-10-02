@@ -40,3 +40,6 @@ jobs:
           POSTGRES_USERNAME: order
           POSTGRES_PASSWORD: order
         run: ./mvnw clean package
+
+      - name: Build Docker image
+        run: docker build -t order-app:${{ github.sha }} .
